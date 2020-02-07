@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: user-management-service
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config-server
+
+eureka:
+  client:
+    registry-fetch-interval-seconds: 5
+    serviceUrl:
+      defaultZone: http://${EUREKA_DISCOVERY_SERVICE_HOSTNAME:localhost}:8761/eureka

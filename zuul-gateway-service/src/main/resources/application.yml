@@ -1,0 +1,30 @@
+server:
+  port: 8765
+
+zuul:
+  prefix: /api
+  routes:
+    user:
+      path: /user/**
+      service-id: user-management-service
+      retryable: true
+  sensitive-headers:
+
+ribbon:
+  ReadTimeout: 60000
+  ConnectTimeout: 10000
+  eureka:
+    enabled: true
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    ROOT: INFO

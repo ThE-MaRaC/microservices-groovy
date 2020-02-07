@@ -1,0 +1,69 @@
+version: '2.4'
+services:
+  eureka-discovery-service:
+    image: mariobros/eureka-discovery-service:0.0.2-SNAPSHOT
+    restart: always
+    ports:
+      - 8761:8761
+
+  config-server:
+    environment:
+      EUREKA_DISCOVERY_SERVICE_HOSTNAME: ${EUREKA_DISCOVERY_SERVICE_HOSTNAME}
+    image: mariobros/config-server:0.0.2-SNAPSHOT
+    restart: always
+    depends_on:
+      eureka-discovery-service:
+        condition: service_healthy
+    ports:
+      - 8888:8888
+
+  admin-server:
+    environment:
+      EUREKA_DISCOVERY_SERVICE_HOSTNAME: ${EUREKA_DISCOVERY_SERVICE_HOSTNAME}
+    image: mariobros/admin-server:0.0.2-SNAPSHOT
+    restart: always
+    depends_on:
+      config-server:
+        condition: service_healthy
+    ports:
+      - 9000:9000
+
+  zuul-gateway-service:
+    environment:
+      EUREKA_DISCOVERY_SERVICE_HOSTNAME: ${EUREKA_DISCOVERY_SERVICE_HOSTNAME}
+    image: mariobros/zuul-gateway-service:0.0.2-SNAPSHOT
+    restart: always
+    depends_on:
+      config-server:
+        condition: service_healthy
+    ports:
+      - 8765:8765
+
+  user-management-service:
+    environment:
+      EUREKA_DISCOVERY_SERVICE_HOSTNAME: ${EUREKA_DISCOVERY_SERVICE_HOSTNAME}
+    image: mariobros/user-management-service:0.0.2-SNAPSHOT
+    restart: always
+    depends_on:
+      config-server:
+        condition: service_healthy
+    ports:
+      - 8080:8080
+
+  angular-client:
+    image: mariobros/angular-client:0.0.1-SNAPSHOT
+    restart: always
+    depends_on:
+      zuul-gateway-service:
+        condition: service_healthy
+    ports:
+      - 81:80
+
+  react-client:
+    image: mariobros/react-client:0.0.1-SNAPSHOT
+    restart: always
+    depends_on:
+      zuul-gateway-service:
+        condition: service_healthy
+    ports:
+      - 80:80
